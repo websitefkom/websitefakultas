@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Remove-Item \"c:\\\\Users\\\\MU\\\\Pictures\\\\doni\\\\website_fkom\\\\lib\\\\utils.js\" -Confirm:$false)",
+      "PowerShell(cd \"c:\\\\Users\\\\MU\\\\Pictures\\\\doni\\\\website_fkom\"; $size = \\(Get-ChildItem node_modules -Recurse -File -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum\\).Sum; $mb = [math]::Round\\($size / 1MB, 1\\); $count = \\(Get-ChildItem node_modules -Recurse -File -ErrorAction SilentlyContinue\\).Count; Write-Host \"node_modules: $mb MB \\($count files\\)\")"
+    ]
+  }
+}
