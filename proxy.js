@@ -1,24 +1,58 @@
+import { withAuth } from 'next-auth/middleware'
 import { NextResponse } from 'next/server'
-import { getToken } from 'next-auth/jwt'
 
-// New `proxy` file to replace deprecated middleware convention.
-// Mirrors the previous `middleware` behavior: protect `/dashboard` routes.
-export async function proxy(req) {
-  const { pathname } = req.nextUrl
+/**
+ * Peta hak akses per route prefix:
+ *   - super_admin : semua halaman dashboard
+ *   - editor      : /dashboard, /dashboard/berita, /dashboard/akademik/prestasi
+ *
+ * Aturan: jika route ada di EDITOR_ALLOWED, editor boleh masuk.
+ * Selain itu hanya super_admin yang boleh.
+ */
+const EDITOR_ALLOWED = [
+  '/dashboard',
+  '/dashboard/berita',
+  '/dashboard/akademik/prestasi',
+]
 
-  if (!pathname.startsWith('/dashboard')) return NextResponse.next()
+export default withAuth(
+  function middleware(req) {
+    const { pathname } = req.nextUrl
+    const token = req.nextauth.token
+    const role = token?.role
 
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
+    // Jika belum login, withAuth sudah redirect ke /login otomatis
+    if (!role) {
+      return NextResponse.redirect(new URL('/login', req.url))
+    }
 
-  if (!token) {
-    const loginUrl = new URL('/login', req.url)
-    loginUrl.searchParams.set('returnTo', req.nextUrl.pathname)
-    return NextResponse.redirect(loginUrl)
+    // Super admin bebas akses semua
+    if (role === 'super_admin') {
+      return NextResponse.next()
+    }
+
+    // Editor: cek apakah path yang dituju termasuk yang diizinkan
+    if (role === 'editor') {
+      const allowed = EDITOR_ALLOWED.some((prefix) => pathname.startsWith(prefix))
+      if (!allowed) {
+        // Redirect ke dashboard
+        return NextResponse.redirect(new URL('/dashboard', req.url))
+      }
+    }
+
+    return NextResponse.next()
+  },
+  {
+    callbacks: {
+      // Jalankan middleware hanya jika ada token (sudah login)
+      authorized: ({ token }) => !!token,
+    },
   }
-
-  return NextResponse.next()
-}
+)
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/dashboard'],
+  // Terapkan middleware ke seluruh halaman dashboard & API yang butuh auth
+  matcher: [
+    '/dashboard/:path*',
+  ],
 }

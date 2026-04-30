@@ -2,7 +2,8 @@ import { Geist, Geist_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from '@/components/ui/toast';
 import BackToTop from './components/BackToTop';
-import VisitTracker from './components/VisitTracker.client'; // ← tambahan
+import VisitTracker from './components/VisitTracker.client';
+import Providers from './components/Providers';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,11 +36,13 @@ export default function RootLayout({ children }) {
         <meta name="theme-color" content="#ffffff" />
       </head>
       <body className="antialiased" suppressHydrationWarning>
-        <ToastProvider>
-          <VisitTracker /> {/* ← mencatat kunjungan di semua halaman */}
-          {children}
-          <BackToTop />
-        </ToastProvider>
+        <Providers>
+          <ToastProvider>
+            <VisitTracker />
+            {children}
+            <BackToTop />
+          </ToastProvider>
+        </Providers>
       </body>
     </html>
   );

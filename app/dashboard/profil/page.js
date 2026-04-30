@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Pencil, Trash, Info } from "lucide-react";
+import { Plus, Pencil, Trash, Info, Loader2 } from "lucide-react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import Image from "next/image";
@@ -11,12 +11,15 @@ import Image from "next/image";
 import Sidebar from "@/app/components/Dashboard/Sidebar";
 import Navbar from "@/app/components/Dashboard/Navbar";
 import Footer from "@/app/components/Dashboard/Footer";
+import { useRoleGuard } from "@/hooks/useRoleGuard";
+import UnauthorizedBlock from "@/app/components/UnauthorizedBlock";
 
 const MySwal = withReactContent(Swal);
 
 export default function AdminProfil() {
   const [tab, setTab] = useState("tentang");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { hasAccess, isLoading, session } = useRoleGuard('super_admin');
 
   const [tentangKami, setTentangKami] = useState({ visi: "", misi: [], tujuan: [] });
   const [strukturOrganisasi, setStrukturOrganisasi] = useState([]);
@@ -255,13 +258,30 @@ export default function AdminProfil() {
     { key: "tautan", label: "Tautan" },
   ];
 
+  if (isLoading) {
+    return (
+      <div className="flex flex-col md:flex-row bg-blue-50 min-h-screen w-full font-sans">
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} userRole={session?.user?.role} />
+        <div className={`flex-1 min-h-screen transition-all duration-300 ${sidebarOpen ? "md:ml-64" : ""} flex flex-col`}>
+          <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+          <main className="flex-1 flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          </main>
+          <Footer />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col md:flex-row bg-blue-50 min-h-screen w-full font-sans">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} userRole="admin" />
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} userRole={session?.user?.role} />
       <div className={`flex-1 min-h-screen transition-all duration-300 ${sidebarOpen ? "md:ml-64" : ""} flex flex-col`}>
-        <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} userData={{ role: "admin", nama: "Admin" }} />
+        <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} userData={{ role: session?.user?.role, nama: session?.user?.name || "Admin" }} />
 
         <main className="w-full max-w-7xl mx-auto px-4 pt-20 pb-24 flex-1">
+          {!hasAccess ? <UnauthorizedBlock /> : (
+          <>
           {/* Page header (aligned with peraturan page) */}
           <div className="mb-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -413,6 +433,8 @@ export default function AdminProfil() {
               </motion.div>
             )}
           </AnimatePresence>
+          </>
+          )}
         </main>
 
         <Footer />

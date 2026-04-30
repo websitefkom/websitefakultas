@@ -5,8 +5,12 @@ import Navbar from '@/app/components/Dashboard/Navbar'
 import Footer from '@/app/components/Dashboard/Footer'
 import VisitChart from './VisitChart.client'
 import { FiFileText, FiUsers, FiEye, FiTrendingUp, FiRefreshCw } from 'react-icons/fi'
+import { Loader2 } from 'lucide-react'
+import { useRoleGuard } from '@/hooks/useRoleGuard'
+import UnauthorizedBlock from '@/app/components/UnauthorizedBlock'
 
 export default function DashboardLanding({ beritaCount = 0, prestasiCount = 0, prodiCount = 0, userCount = 0, visitCount = 0, totalArticleViews = 0, topArticles = [] }) {
+  const { hasAccess, isLoading, session } = useRoleGuard(['super_admin', 'editor'])
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [series, setSeries] = useState([])
   const [labels, setLabels] = useState([])
@@ -56,21 +60,39 @@ export default function DashboardLanding({ beritaCount = 0, prestasiCount = 0, p
     return () => { mounted = false }
   }, [statDays])
 
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-slate-50">
+        <div className="flex flex-col md:flex-row bg-gray-50 min-h-screen w-full">
+          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} userRole={session?.user?.role} />
+          <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? "md:ml-64" : ""} flex flex-col`}>
+            <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+            <main className="flex-1 flex items-center justify-center">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+            </main>
+            <Footer />
+          </div>
+        </div>
+      </main>
+    )
+  }
+
   return (
     <main className="min-h-screen bg-slate-50">
     <div className="flex flex-col md:flex-row bg-gray-50 min-h-screen w-full">
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
-        userRole="admin"
+        userRole={session?.user?.role}
       />
    <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? "md:ml-64" : ""} flex flex-col`}>
         <Navbar
           toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-          userData={{ role: "admin", nama: "Admin" }}
+          userData={{ role: session?.user?.role, nama: session?.user?.name || 'Admin' }}
         />
 
           <div className="pt-16 p-8">
+            {!hasAccess ? <UnauthorizedBlock /> : (
             <div className="max-w-6xl mx-auto">
               <h1 className="text-3xl font-bold mb-2">Dashboard — Statistik Situs</h1>
               <p className="text-slate-600 mb-6">Ringkasan data saat ini untuk administrasi.</p>
@@ -191,6 +213,7 @@ export default function DashboardLanding({ beritaCount = 0, prestasiCount = 0, p
                 </div>
               </div>
             </div>
+            )}
           </div>
 
           <footer className="mt-auto bg-white">

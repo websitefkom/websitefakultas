@@ -7,6 +7,8 @@ import Navbar from "@/app/components/Dashboard/Navbar";
 import Footer from "@/app/components/Dashboard/Footer";
 import { Dialog, Transition, Menu } from "@headlessui/react";
 import { Button } from "@/components/ui/button";
+import { useRoleGuard } from "@/hooks/useRoleGuard";
+import UnauthorizedBlock from "@/app/components/UnauthorizedBlock";
 // Build viewer URL for a document object.
 // Prioritize cloudinaryUrl because Google Docs Viewer requires a publicly accessible URL.
 // A relative proxy path (/api/...) or localhost URL will cause "No preview available".
@@ -169,6 +171,7 @@ function DokumenModal({ open, onClose, onSubmit, initial }) {
 
 export default function PeraturanAdminPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { hasAccess, isLoading: isRoleLoading, session } = useRoleGuard('super_admin');
   const [activeTab, setActiveTab] = useState('ketentuan');
   const [loading, setLoading] = useState(true);
   const [savingSection, setSavingSection] = useState(null); // section name
@@ -578,12 +581,29 @@ export default function PeraturanAdminPage() {
     }
   };
 
+  if (isRoleLoading) {
+    return (
+      <div className="flex flex-col md:flex-row bg-gradient-to-b from-white to-gray-50 min-h-screen w-full">
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} userRole={session?.user?.role} />
+        <div className={`flex-1 min-h-screen transition-all duration-300 ${sidebarOpen ? 'md:ml-64' : ''} flex flex-col`}>
+          <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+          <main className="flex-1 flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          </main>
+          <Footer />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col md:flex-row bg-gradient-to-b from-white to-gray-50 min-h-screen w-full">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} userRole="admin" />
-      <div className={`flex-1 min-h-screen transition-all duration-300 ${sidebarOpen ? 'md:ml-64' : ''} flex flex-col`}> 
-        <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} userData={{ role: 'admin', nama: 'Admin' }} />
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} userRole={session?.user?.role} />
+      <div className={`flex-1 min-h-screen transition-all duration-300 ${sidebarOpen ? 'md:ml-64' : ''} flex flex-col`}>
+        <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} userData={{ role: session?.user?.role, nama: session?.user?.name || 'Admin' }} />
         <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-28 flex-1">
+          {!hasAccess ? <UnauthorizedBlock /> : (
+          <>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <div>
               <h1 className="text-2xl md:text-3xl font-extrabold text-gray-800 flex items-center gap-3"><Info className="w-6 h-6 text-[#2563eb]" />Manajemen Peraturan Akademik</h1>
@@ -819,6 +839,8 @@ export default function PeraturanAdminPage() {
               </Transition>
             </div>
           </div>
+          </>
+          )}
         </main>
         <Footer />
         {/* Modal Edit Dokumen */}

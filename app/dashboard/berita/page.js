@@ -15,6 +15,9 @@ import {
 } from "react-icons/fi";
 import Swal from "sweetalert2";
 import { AiOutlineReload } from "react-icons/ai";
+import { Loader2 } from "lucide-react";
+import { useRoleGuard } from "@/hooks/useRoleGuard";
+import UnauthorizedBlock from "@/app/components/UnauthorizedBlock";
 
 // Inline styles will be used for modal overlays and panels below for clarity
 
@@ -27,6 +30,7 @@ export default function AdminBerita() {
     .animate-modal-in { animation: modal-in 240ms cubic-bezier(.2,.9,.2,1) forwards; }
   `;
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { hasAccess, isLoading: isRoleLoading, session } = useRoleGuard(['super_admin', 'editor']);
   const [list, setList] = useState([]);
   const [lastCreatedId, setLastCreatedId] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -321,20 +325,36 @@ export default function AdminBerita() {
     setPreviewOpen(true);
   }
 
+  if (isRoleLoading) {
+    return (
+      <div className="flex flex-col md:flex-row bg-gray-50 min-h-screen w-full">
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} userRole={session?.user?.role} />
+        <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? "md:ml-64" : ""} flex flex-col`}>
+          <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+          <main className="flex-1 flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          </main>
+          <Footer />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col md:flex-row bg-gray-50 min-h-screen w-full">
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
-        userRole="admin"
+        userRole={session?.user?.role}
       />
    <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? "md:ml-64" : ""} flex flex-col`}>
         <Navbar
           toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-          userData={{ role: "admin", nama: "Admin" }}
+          userData={{ role: session?.user?.role, nama: session?.user?.name || "Admin" }}
         />
         <main className="w-full max-w-7xl mx-auto px-4 pt-20 pb-24 flex-1">
           <style dangerouslySetInnerHTML={{ __html: localStyles }} />
+          {!hasAccess ? <UnauthorizedBlock /> : (
           <div className="max-w-7xl mx-auto px-4 py-8 min-h-[80vh]">
             {/* Breadcrumb */}
             <nav className="text-sm text-gray-500 mb-4" aria-label="Breadcrumb">
@@ -574,6 +594,7 @@ export default function AdminBerita() {
               </div>
             </div>
           </div>
+          )}
         </main>
 
         {/* Preview Modal */}

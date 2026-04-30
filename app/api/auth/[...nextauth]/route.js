@@ -56,6 +56,10 @@ const options = {
     },
   },
 
+  pages: {
+    signIn: '/login',
+  },
+
   // require NEXTAUTH_SECRET in production
   secret: process.env.NEXTAUTH_SECRET,
 }

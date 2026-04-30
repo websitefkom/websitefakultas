@@ -39,7 +39,10 @@ export async function POST(req) {
     return new Response(JSON.stringify(out), { status: 201, headers: { 'Content-Type': 'application/json' } })
   } catch (err) {
     console.error('POST /api/users error', err)
-    return new Response(JSON.stringify({ error: 'Gagal membuat pengguna' }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+    const message = err?.name === 'ValidationError'
+      ? Object.values(err.errors).map(e => e.message).join(', ')
+      : (err?.message || 'Gagal membuat pengguna')
+    return new Response(JSON.stringify({ error: message }), { status: 500, headers: { 'Content-Type': 'application/json' } })
   }
 }
 
@@ -58,7 +61,10 @@ export async function PUT(req) {
     return new Response(JSON.stringify(out), { status: 200, headers: { 'Content-Type': 'application/json' } })
   } catch (err) {
     console.error('PUT /api/users error', err)
-    return new Response(JSON.stringify({ error: 'Gagal memperbarui pengguna' }), { status: 500, headers: { 'Content-Type': 'application/json' } })
+    const message = err?.name === 'ValidationError'
+      ? Object.values(err.errors).map(e => e.message).join(', ')
+      : (err?.message || 'Gagal memperbarui pengguna')
+    return new Response(JSON.stringify({ error: message }), { status: 500, headers: { 'Content-Type': 'application/json' } })
   }
 }
 

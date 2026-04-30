@@ -8,8 +8,7 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true },
   name: { type: String, required: true },
   image: { type: String, default: null },
-  role: { type: String, enum: ['super_admin', 'dekan', 'ketua_dept', 'kepala_dept', 'sekretaris'], default: 'sekretaris', index: true },
-  unitKerja: { type: String, required: function () { return ['ketua_dept', 'kepala_dept', 'sekretaris'].includes(this.role) }, default: null },
+  role: { type: String, enum: ['super_admin', 'editor'], default: 'editor', index: true },
 }, { timestamps: true, collection: 'users' })
 
 // Pre-save: generate human-friendly _id if not provided

@@ -82,7 +82,7 @@ export default function LoginPage() {
         return;
       }
       setIsLoading(false);
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
     } catch (err) {
       console.error("Sign in error", err);
       setError("Email atau password salah!");

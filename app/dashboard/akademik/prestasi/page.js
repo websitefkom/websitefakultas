@@ -3,14 +3,17 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '@/app/components/Dashboard/Sidebar';
 import Navbar from '@/app/components/Dashboard/Navbar';
 import Footer from '@/app/components/Dashboard/Footer';
-import { Edit, Trash2, Plus, Search } from 'lucide-react';
+import { Edit, Trash2, Plus, Search, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { z } from 'zod';
 import Image from 'next/image';
+import { useRoleGuard } from "@/hooks/useRoleGuard";
+import UnauthorizedBlock from "@/app/components/UnauthorizedBlock";
 
 const MySwal = withReactContent(Swal);
+
 
 export default function PrestasiAdminPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -19,6 +22,8 @@ export default function PrestasiAdminPage() {
   const [allData, setAllData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+   // ✅ Editor & Super Admin boleh akses halaman ini
+  const { hasAccess, isLoading, session } = useRoleGuard(['super_admin', 'editor']);
 
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -280,14 +285,32 @@ const performEdit = async (values) => {
       setActionLoading(false);
     }
   };
-
-  return (
-    <div className="flex">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className={`flex-1 min-h-screen bg-gray-50 transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-0'} pb-20`}>
+ if (isLoading) {
+    return (
+      <div className="flex flex-col md:flex-row bg-gray-50 min-h-screen w-full">
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} userRole={session?.user?.role} />
+        <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? "md:ml-64" : ""} flex flex-col`}>
+          <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+          <main className="w-full max-w-7xl mx-auto px-4 pt-20 pb-24 flex-1 flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          </main>
+          <Footer />
+        </div>
+      </div>
+    );
+  }
+  
+    return (
+    <div className="flex flex-col md:flex-row bg-gray-50 min-h-screen w-full">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} userRole={session?.user?.role} />
+      <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? "md:ml-64" : ""} flex flex-col`}>
         <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-
-        <main className="p-8 mt-14">
+ 
+        <main className="w-full max-w-7xl mx-auto px-4 pt-20 pb-24 flex-1">
+          {!hasAccess ? (
+            <UnauthorizedBlock />
+          ) : (
+            <>
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl font-semibold text-slate-900">Prestasi</h1>
             <div className="space-x-2">
@@ -412,6 +435,8 @@ const performEdit = async (values) => {
               </div>
             </div>
           </motion.div>
+            </>
+          )}
         </main>
         {/* Modal instance */}
         <PrestasiModal
@@ -576,7 +601,7 @@ function PrestasiModal({ open, mode, role, data, onClose, onSubmit, loading }) {
                   <div>
                     <label className="text-sm font-medium">Judul</label>
                     <input value={form.judul} onChange={(e)=>setField('judul', e.target.value)} placeholder="Judul prestasi" className="w-full border rounded px-3 py-2 mt-1" />
-                    <p className="text-xs text-gray-500 mt-1">Gunakan kata kunci 'Juara 1', 'Gold', atau 'Emas' agar muncul Badge spesial di halaman publik.</p>
+                    <p className="text-xs text-gray-500 mt-1">Gunakan kata kunci &apos;Juara 1&apos;, &apos;Gold&apos;, atau &apos;Emas&apos; agar muncul Badge spesial di halaman publik.</p>
                     {errors.judul && <div className="text-xs text-red-600 mt-1">{errors.judul}</div>}
                   </div>
 
