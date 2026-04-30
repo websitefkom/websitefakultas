@@ -118,20 +118,20 @@ function DokumenModal({ open, onClose, onSubmit, initial }) {
                 <div>
                   <label className="block text-sm font-medium text-gray-600 mb-2">File Dokumen (PDF/DOCX)</label>
                   <div
-                    className={`w-full rounded-lg border-dashed ${dragActive ? 'border-blue-400 bg-blue-50' : 'border-gray-200 bg-white'} border px-3 py-6 flex items-center justify-between gap-4 transition-all duration-150`}
+                    className={`w-full rounded-lg border-dashed ${dragActive ? 'border-blue-400 bg-blue-50' : 'border-gray-200 bg-white'} border px-3 py-6 flex items-center justify-between gap-4 transition-all duration-150 overflow-hidden`}
                     onDragEnter={(e) => { e.preventDefault(); setDragActive(true); }}
                     onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
                     onDragLeave={(e) => { e.preventDefault(); setDragActive(false); }}
                     onDrop={(e) => { e.preventDefault(); setDragActive(false); const dropped = e.dataTransfer.files?.[0]; if (dropped) setFile(dropped); }}
                   >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 flex items-center justify-center rounded-md bg-gradient-to-b from-[#f0f9ff] to-white text-[#2563eb]">
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-md bg-gradient-to-b from-[#f0f9ff] to-white text-[#2563eb]">
                           <FileText className="w-6 h-6" />
                         </div>
-                        <div className="min-w-0">
-                          <div className="font-medium text-sm text-gray-800 truncate">{file ? file.name : (initial?.url ? 'File terpasang (klik Lihat)' : 'Tarik dan lepas file di sini atau pilih file')}</div>
-                          <div className="text-xs text-gray-500">{file ? `${Math.round(file.size/1024)} KB — ${file.type || 'File'}` : 'Format: .pdf, .doc, .docx'}</div>
+                        <div className="min-w-0 overflow-hidden flex-1">
+                          <div className="font-medium text-sm text-gray-800 truncate max-w-full">{file ? file.name : (initial?.url ? 'File terpasang (klik Lihat)' : 'Tarik dan lepas file di sini atau pilih file')}</div>
+                          <div className="text-xs text-gray-500 truncate">{file ? `${Math.round(file.size/1024)} KB — ${file.type || 'File'}` : 'Format: .pdf, .doc, .docx'}</div>
                         </div>
                       </div>
                       {errors.file && <p className="mt-2 text-xs text-red-600">{errors.file}</p>}
