@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState, useMemo, useRef } from 'react'
+import { useEffect, useState, useMemo, useRef, Suspense } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -13,6 +13,7 @@ function excerptFromHtml(html, max = 140) {
     const tmp = html.replace(/<[^>]+>/g, '')
     return tmp.length > max ? tmp.slice(0, max).trim() + '...' : tmp
 }
+export const dynamic = 'force-dynamic'
 
 function readingTime(html) {
     if (!html) return '1 min'
@@ -22,7 +23,7 @@ function readingTime(html) {
     return `${mins} min`
 }
 
-export default function BeritaPage() {
+function BeritaContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const pathname = usePathname()
@@ -498,5 +499,13 @@ export default function BeritaPage() {
 
             <Footer />
         </>
+    )
+}
+
+export default function BeritaPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-400">Memuat...</div>}>
+            <BeritaContent />
+        </Suspense>
     )
 }
