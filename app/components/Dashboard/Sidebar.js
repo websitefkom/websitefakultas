@@ -109,7 +109,7 @@ export default function Sidebar({ isOpen, onClose }) {
             <div className="leading-tight">
               <div className="text-lg font-extrabold">FKOM CMS</div>
               <div className="text-xs text-white/80">
-                Sistem Manajemen Konten Fakultas Komputer
+                Portal Publikasi &amp; Informasi — Fakultas Komputer Ma&#39;soem
               </div>
             </div>
           </h2>
@@ -188,7 +188,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
           <div className="pt-4 mt-auto border-t border-white/10">
             <div className="px-4 py-3 text-xs text-white/50">
-              © {new Date().getFullYear()} FKOM CMS — Fakultas Komputer Ma&#39;soem
+              © {new Date().getFullYear()} FKOM CMS — Portal Publikasi &amp; Informasi
             </div>
           </div>
         </div>
