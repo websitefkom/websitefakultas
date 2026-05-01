@@ -423,7 +423,7 @@ const LandingPage = () => {
 
           {/* Tombol */}
           <a
-            href="https://teknik.widyatama.ac.id/profil/"
+            href="https://fkom-masoemuniversity.vercel.app/profil"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 px-8 py-3 text-lg font-semibold text-blue-900 bg-yellow-400 rounded-full hover:bg-yellow-500 transition-all duration-300 shadow-lg hover:shadow-xl"
