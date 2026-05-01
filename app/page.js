@@ -300,7 +300,7 @@ const LandingPage = () => {
           >
             <div className="absolute inset-0 w-full h-full z-0">
               <Image
-                src="/background/fotohome1.jpg"
+                src="/background/fotohome.jpg"
                 alt="Gedung kampus dan suasana belajar"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
