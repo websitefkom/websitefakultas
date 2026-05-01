@@ -37,7 +37,7 @@ export default function Profil() {
       <section className="relative min-h-[60vh] flex items-center justify-center text-center">
         {/* Background */}
         <Image
-          src="/public/background/bersama.JPG"
+          src="/background/bersama.JPG"
           alt="Campus Background"
           fill
           priority
