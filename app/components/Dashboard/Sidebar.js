@@ -105,14 +105,14 @@ export default function Sidebar({ isOpen, onClose }) {
         <div className="p-6 h-full flex flex-col">
           {/* Logo */}
           <h2 className="text-xl font-bold mb-3 flex items-center gap-3 text-white/95 px-2">
-            <GraduationCap className="w-6 h-6 text-indigo-400" />
-            <div className="leading-tight">
-              <div className="text-lg font-extrabold">FKOM Nexus</div>
-              <div className="text-xs text-white/80">
-                Portal Publikasi &amp; Informasi — Fakultas Komputer Ma&#39;soem
-              </div>
-            </div>
-          </h2>
+  <GraduationCap className="w-6 h-6 text-indigo-400" />
+  <div className="leading-tight">
+    <div className="text-lg font-extrabold">FKOM CMS</div>
+    <div className="text-xs text-white/80">
+      Sistem Manajemen Konten Fakultas Komputer
+    </div>
+  </div>
+</h2>
 
           {/* Badge role */}
           {userRole && (
@@ -186,10 +186,9 @@ export default function Sidebar({ isOpen, onClose }) {
             ))}
           </ul>
 
-          <div className="pt-4 mt-auto border-t border-white/10">
-            <div className="px-4 py-3 text-xs text-white/50">
-              © {new Date().getFullYear()} FKOM Nexus — Portal Publikasi &amp; Informasi
-            </div>
+<div className="px-4 py-3 text-xs text-white/50">
+  © {new Date().getFullYear()} FKOM CMS — Fakultas Komputer Ma&#39;soem
+</div>
           </div>
         </div>
       </aside>
